@@ -1,0 +1,16 @@
+Step 3: Add to TrueNAS Boot (Init Script)
+
+
+
+Go to TrueNAS Web UI
+System → Advanced → Init/Shutdown Scripts → Add
+Fill in:
+
+Description: LincStation RGB + Active LEDs
+Type: Script
+Script: /mnt/tank/scripts/lincstation-led-rgb-on.sh
+When: Post Init
+Enabled: Checked
+
+
+Save
