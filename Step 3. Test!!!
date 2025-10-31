@@ -4,3 +4,10 @@ Expected Output
 
 LED chip found on i2c-0
 SUCCESS: RGB ON, Active bays ON, Empty OFF (bus 0)
+
+Result:
+
+RGB strip = solid white
+Only populated drive bays = ON
+Empty bays = OFF
+No blinking
