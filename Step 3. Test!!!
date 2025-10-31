@@ -1,1 +1,6 @@
 sudo /mnt/tank/scripts/lincstation-led-rgb-on.sh
+
+Expected Output
+
+LED chip found on i2c-0
+SUCCESS: RGB ON, Active bays ON, Empty OFF (bus 0)
