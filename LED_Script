@@ -1,0 +1,60 @@
+Create the Smart LED Script
+
+sudo tee /mnt/tank/scripts/lincstation-led-rgb-on.sh > /dev/null << 'EOF'
+#!/bin/bash
+# LincStation N1 – RGB ON + Active Bays ON + Empty OFF
+# Dynamic bus detection (prioritizes bus 3)
+
+find_led_bus() {
+    if sudo i2cdetect -y 3 2>/dev/null | grep -q "26"; then
+        echo "3"
+        return
+    fi
+    for bus in {0..14}; do
+        if sudo i2cdetect -y $bus 2>/dev/null | grep -q "26"; then
+            echo "$bus"
+            return
+        fi
+    done
+    echo "NO_BUS"
+}
+
+BUS=$(find_led_bus)
+if [ "$BUS" = "NO_BUS" ]; then
+    echo "ERROR: LED chip not found. Run 'sudo i2cdetect -l'"
+    exit 1
+fi
+
+echo "LED chip found on i2c-$BUS"
+
+modprobe i2c-dev 2>/dev/null
+sleep 1
+
+# Disable blinking (all 6 bays)
+sudo i2cset -y $BUS 0x26 0x52 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x54 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x56 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x58 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x5A 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x5C 0x00 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x5E 0x00 2>/dev/null || true
+
+# Turn on all 6 bays (hardware auto-blanks empty ones)
+sudo i2cset -y $BUS 0x26 0xB0 0x04 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0xB0 0x08 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0xB0 0x10 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0xB0 0x20 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0xB0 0x40 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0xB0 0x80 2>/dev/null || true
+
+# RGB ON (solid white, 100% brightness)
+sudo i2cset -y $BUS 0x26 0x20 0x01 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x21 0xFF 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x22 0xFF 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x23 0xFF 2>/dev/null || true
+sudo i2cset -y $BUS 0x26 0x24 0x64 2>/dev/null || true
+
+echo "SUCCESS: RGB ON, Active bays ON, Empty OFF (bus $BUS)"
+EOF
+
+sudo chmod +x /mnt/tank/scripts/lincstation-led-rgb-on.sh
