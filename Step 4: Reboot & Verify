@@ -1,0 +1,7 @@
+
+
+bashsudo reboot
+After boot:
+bashsudo journalctl -t kernel | grep LincStation
+Should show:
+textSUCCESS: RGB ON, Active bays ON, Empty OFF (bus X)
